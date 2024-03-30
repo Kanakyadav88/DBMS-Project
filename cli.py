@@ -61,15 +61,13 @@ while(True):
         while (valid_admin):
             print(f"\nWelcome {username}")
             print("""Please choose a number from the menu to proceed: 
-
 1. View Quarterly Sales of the each Category
 2. View Top 5 Customers(based on money spent)
 3. Data of items in the Inventory for each storage type
 4. Add Category
 5. View All Category
-6. Add Seller
-7. View all Sellers
-6. Log out\n""")
+6. View all Sellers
+7. Log out\n""")
             input_admin = int(input("Enter the number: "))
             
             if (input_admin == 1):
@@ -126,22 +124,26 @@ Category IS NOT NULL"""
 
             if (input_admin == 4):
                 input_add_category = input("Enter the name of Category that you want to Add: ")
-                #PLEASE CHECK IF WE CAN ALSO INSERT ONE PRODUCT WHILE WE MAKE A CATEGORY, I HAVE LEFT THAT OUT RN
-                #input_prod = input(f"Enter the name of one product to add in {input_add_category}")
                 category_id = int(input("Enter Category ID: "))
                 query_category = """INSERT INTO Category(category_ID, category_name) VALUES (%s,%s);"""
                 val = (category_id, input_add_category)
                 cursor.execute(query_category, val)
                 mydb.commit()
 
-            elif (input_admin == 2):
+            elif (input_admin == 5):
                 query = "select * from Category"
                 cursor.execute(query)
                 for row in cursor.fetchall():
                     print(f"Category ID: {row[0]}, Category Name: {row[1]}")
 
-            elif (input_admin == 3):
-                break
+            elif (input_admin == 6):
+                query = "select * from Seller"
+                cursor.execute(query)
+                for row in cursor.fetchall():
+                    print(f"Seller ID: {row[0]}, Seller Name: {row[2]}, Product ID sold: {row[3]}, Quantity Sold: {row[4]}, Phone Number: {row[5]}")
+
+            elif (input_admin == 7):
+                break;    
                 
             else:
                 print("Invalid Input!")
@@ -225,7 +227,7 @@ Category IS NOT NULL"""
             elif (input_user == 3):
                 #checkout or placing an order
                 print("Items in your cart: ")
-                query_view_cart = f"""select Cart.quantity, Cart.billing_amount, Product.product_ID, Product.name, Cart.product_ID, Cart.username from Product, Cart where Product.product_ID = Cart.product_ID"""
+                query_view_cart = f"""select Cart.quantity, Cart.billing_amount, Products.product_ID, Products.name, Cart.product_ID, Cart.customer_username from Products, Cart where Products.product_ID = Cart.product_ID;"""
                 cursor.execute(query_view_cart)
 
                 for row in cursor.fetchall():
