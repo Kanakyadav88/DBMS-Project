@@ -15,7 +15,8 @@ if mydb.is_connected():
 
 # Create cursor object
 cursor = mydb.cursor()
-
+login_attempts = 0
+max_attempts = 3
 while(True):
     print("\n")
     print("Online Store Amazon")
@@ -27,11 +28,11 @@ while(True):
         """ 1. Admin LogIn 
             2. User LogIn
             3. User SignUp
-            4. Distributor LogIn
+            4. Seller LogIn
             5. Exit"""
           )
           
-    #SHOULD WE MAKE A DISTRIBUTOR SIGN-UP?
+    #SHOULD WE MAKE A Seller SIGN-UP?
 
     input_landing_page = int(input("Enter the number: "))
     #ADMIN LOGIN
@@ -226,7 +227,7 @@ ORDER BY Category, Year DESC, Month DESC;"""
 
                 method_to_pay = input("Method to pay (COD/UPI/card/wallet) : ")
 
-                query_insert = """insert into Billing (billingID, payment_mode, bill_amount,  order_ID) values ( %s, %s, %s, %s)"""
+                query_insert = """insert into Billing (billing_ID, payment_mode, bill_amount,  order_ID) values ( %s, %s, %s, %s)"""
                 val = (111, method_to_pay, round(float(bill_amount),2), 12)
                 cursor.execute(query_insert,val)
                 mydb.commit ()
@@ -264,29 +265,58 @@ ORDER BY Category, Year DESC, Month DESC;"""
     
     elif (input_landing_page == 4):
         while(True):
-            query_auth_dist = """Select distributorID,password from Distributor"""
-            id_dist = int(input("Enter your Distributor ID: "))
-            cursor.execute(query_auth_dist)
-            valid_user = 0
+            query_auth_seller = """SELECT seller_ID, password, name FROM Seller"""
+            seller_name = input("Enter your Seller Name: ")
+            password = input("Enter your password: ")
+            cursor.execute(query_auth_seller)
+            valid_user = False
+            seller_data = None
             for row in cursor.fetchall():
-                if (id_dist) == row[0]:
-                    store = row
-                    print(row)
-                    valid_user = 1
+                if seller_name == row[2] and password == row[1]:
+                    seller_data = row
+                    valid_user = True
                     break
             if valid_user:
-                break
-            else: 
-                print("Invalid ID\n")
-
-        while(True):
-            password = input("Enter your password: ")
-            if password in store:
-                print("Authenticated")
+                print("Authenticated\n")
                 break
             else:
-                print("Invalid Password \n")
-    
+                login_attempts += 1
+                if login_attempts < max_attempts:
+                    print("Invalid Seller Name or Password. Please try again.\n")
+                    print(f"{max_attempts - login_attempts} attempts remaining.\n")
+                else:
+                    print("Maximum login attempts reached. Exiting...\n")
+                    exit()
+
+        while valid_user:
+            print(f"\nWelcome {seller_name}")
+            print("""Please choose a number from the menu to proceed: 
+
+            1. View Seller Details
+            2. Log out\n""")
+            input_seller = int(input("Enter the number: "))
+
+            if input_seller == 1:
+                print("\nSeller Details: ")
+                # Fetch all attributes and their values for the particular seller
+                query_fetch_details = """SELECT * FROM Seller WHERE seller_ID = %s"""
+                cursor.execute(query_fetch_details, (seller_data[0],))
+                seller_details = cursor.fetchone()
+                    
+                 # Display all attributes and their values
+                print("Seller ID:", seller_details[0])
+                print("Product ID:", seller_details[3])
+                print("Quantity Sold:", seller_details[4])
+                print("Phone Number:", seller_details[5])
+                print("Email Address:", seller_details[6])
+                print("Earnings:", seller_details[7])
+                print("Payment Details:", seller_details[8])
+
+            elif input_seller == 2:
+                break
+            else:
+                print("Invalid Input!")
+                
 
     elif(input_landing_page == 5):
         break
