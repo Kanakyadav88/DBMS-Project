@@ -28,8 +28,7 @@ while(True):
             2. User LogIn
             3. User SignUp
             4. Distributor LogIn
-            5. NGO funds raised
-            6. Exit"""
+            5. Exit"""
           )
           
     #SHOULD WE MAKE A DISTRIBUTOR SIGN-UP?
@@ -289,7 +288,7 @@ ORDER BY Category, Year DESC, Month DESC;"""
                 print("Invalid Password \n")
     
 
-    elif(input_landing_page == 6):
+    elif(input_landing_page == 5):
         break
     
     else:
