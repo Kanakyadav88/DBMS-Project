@@ -62,45 +62,69 @@ while(True):
             print(f"\nWelcome {username}")
             print("""Please choose a number from the menu to proceed: 
 
-
-1. Add Category
-2. View All Category
-3. Log out\n""")
+1. View Quarterly Sales of the each Category
+2. View Top 5 Customers(based on money spent)
+3. Data of items in the Inventory for each storage type
+4. Add Category
+5. View All Category
+6. Add Seller
+7. View all Sellers
+6. Log out\n""")
             input_admin = int(input("Enter the number: "))
             
-            query_report = """SELECT
-Category.category_name AS Category,
+            if (input_admin == 1):
+                query_report = """SELECT
+    Category.category_name AS Category,
+    SUM(Orders.order_amount) AS Total_Sales_Amount,
+    SUM(Orders.quantity) AS Total_Quantity_Sold
 FROM
-Category
-JOIN Product ON Category.category_ID = Product.category_ID
-JOIN Orders ON Product.product_ID = Orders.product_ID
+    Category
+JOIN Products ON Category.category_ID = Products.category_ID
+JOIN Orders ON Products.product_ID = Orders.product_ID
 JOIN Billing ON Orders.order_ID = Billing.order_ID
 WHERE
-Order.date_order_placed >= DATE_SUB(NOW(), INTERVAL 3 MONTH)
+    Orders.date_order_placed >= DATE_SUB(NOW(), INTERVAL 3 MONTH)
 GROUP BY
-Category.category_name WITH ROLLUP
+    Category.category_name  WITH ROLLUP
 HAVING
 Category IS NOT NULL"""
                 
+                cursor.execute(query_report)
+                print("---------------------------------------------")
+                for row in cursor.fetchall():
+                    print(f"Category: {row[0]}\nSales from the Category (Rs.): {row[1]}\nQuantity sold (units): {row[2]}")
+                    print("---------------------------------------------")
+            
+            elif (input_admin == 2):
+                query_top_5_cust = """SELECT 
+                CASE 
+                WHEN GROUPING(customer_username) = 1 THEN 'All Customers'
+                ELSE customer_username
+                END AS Customer,
+                SUM(order_amount) AS TotalAmount 
+                FROM 
+                    Orders
+                GROUP BY customer_username with
+                    ROLLUP
+                HAVING 
+                    customer_username IS NOT NULL 
+                ORDER BY 
+                    TotalAmount DESC 
+                LIMIT 
+                    5;
+                """
+                cursor.execute(query_top_5_cust)
+                print("---------------------------------------------")
+                for row in cursor.fetchall():
+                    print(row)
+            
+            elif (input_admin == 3):    
+                query_inv = """SELECT storage_type, SUM(quantity_in_stock) AS amt FROM Products Group by storage_type with ROLLUP having storage_type is not null"""
+                cursor.execute(query_inv)
+                for row in cursor.fetchall():
+                    print(row)
 
-            query_data = """SELECT
-COALESCE(c.category_name, 'All Categories') AS Category,
-YEAR(o.date_order_placed) AS Year,
-MONTH(o.date_order_placed) AS Month,
-SUM(o.order_amount) AS Sales,
-COUNT(DISTINCT o.username) AS Customers,
-COUNT(DISTINCT o.product_ID) AS Products
-FROM
-Order o
-JOIN Product p ON o.product_ID = p.product_ID
-JOIN Category c ON p.category_ID = c.category_ID
-GROUP BY Category, Year, Month with ROLLUP
-HAVING
-Month is NOT NULL
-ORDER BY Category, Year DESC, Month DESC;"""
-           
-
-            if (input_admin == 1):
+            if (input_admin == 4):
                 input_add_category = input("Enter the name of Category that you want to Add: ")
                 #PLEASE CHECK IF WE CAN ALSO INSERT ONE PRODUCT WHILE WE MAKE A CATEGORY, I HAVE LEFT THAT OUT RN
                 #input_prod = input(f"Enter the name of one product to add in {input_add_category}")
