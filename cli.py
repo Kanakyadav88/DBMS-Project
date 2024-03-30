@@ -1,4 +1,5 @@
 import mysql.connector
+from datetime import datetime
 
 # Establish connection
 mydb = mysql.connector.connect(
@@ -26,7 +27,7 @@ while(True):
         """ 1. Admin LogIn 
             2. User LogIn
             3. User SignUp
-            4. Seller LogIn
+            4. Distributor LogIn
             5. NGO funds raised
             6. Exit"""
           )
@@ -39,38 +40,39 @@ while(True):
         print("ADMIN")
         print("---------------------------------------------")
         count = 0
-        valid_seller = 0
-        while(count<3 and valid_seller == 0):
-            query_auth_admin = """Select username,password from Seller"""
+        valid_admin = 0
+        while(count<3 and valid_admin == 0):
+            query_auth_admin = """Select username,password from Admin"""
             username = input("Enter your username: ")
             password = input("Enter your password: ")
             cursor.execute(query_auth_admin)
             for row in cursor.fetchall():
-                if (username) == row[2] and (password) == row[1]:
+                if (username) == row[0] and (password) == row[1]:
                     # store = row
-                    print(row)
-                    valid_seller = 1
+                    # print(row)
+                    valid_admin = 1
                     print("Authenticated\n")
                     break
-            if valid_seller == 0:
+            if valid_admin == 0:
                 print("Invalid Username or password\n")
                 count+=1
                 print(f"{3-count} tries remaining\n")
 
 
-        while (valid_seller):
+        while (valid_admin):
             print(f"\nWelcome {username}")
             print("""Please choose a number from the menu to proceed: 
 
 
-1. View Seller details
-2. Log out\n""")
+1. Add Category
+2. View All Category
+3. Log out\n""")
             input_admin = int(input("Enter the number: "))
             
             query_report = """SELECT
-Seller.Seller_name AS Seller,
+Category.category_name AS Category,
 FROM
-Seller
+Category
 JOIN Product ON Category.category_ID = Product.category_ID
 JOIN Orders ON Product.product_ID = Orders.product_ID
 JOIN Billing ON Orders.order_ID = Billing.order_ID
@@ -92,21 +94,30 @@ COUNT(DISTINCT o.product_ID) AS Products
 FROM
 Order o
 JOIN Product p ON o.product_ID = p.product_ID
-JOIN Category c ON p.categoryID = c.categoryID
+JOIN Category c ON p.category_ID = c.category_ID
 GROUP BY Category, Year, Month with ROLLUP
 HAVING
 Month is NOT NULL
 ORDER BY Category, Year DESC, Month DESC;"""
            
 
-            
             if (input_admin == 1):
-                query = "select * from Seller"
+                input_add_category = input("Enter the name of Category that you want to Add: ")
+                #PLEASE CHECK IF WE CAN ALSO INSERT ONE PRODUCT WHILE WE MAKE A CATEGORY, I HAVE LEFT THAT OUT RN
+                #input_prod = input(f"Enter the name of one product to add in {input_add_category}")
+                category_id = int(input("Enter Category ID: "))
+                query_category = """INSERT INTO Category(category_ID, category_name) VALUES (%s,%s);"""
+                val = (category_id, input_add_category)
+                cursor.execute(query_category, val)
+                mydb.commit()
+
+            elif (input_admin == 2):
+                query = "select * from Category"
                 cursor.execute(query)
                 for row in cursor.fetchall():
                     print(f"Category ID: {row[0]}, Category Name: {row[1]}")
 
-            elif (input_admin == 2):
+            elif (input_admin == 3):
                 break
                 
             else:
@@ -211,6 +222,9 @@ ORDER BY Category, Year DESC, Month DESC;"""
                 #         bill_amount = row[1]
                 # print(f"billing amount: {bill_amount}")
 
+            
+                
+
                 method_to_pay = input("Method to pay (COD/UPI/card/wallet) : ")
 
                 query_insert = """insert into Billing (billingID, payment_mode, bill_amount,  order_ID) values ( %s, %s, %s, %s)"""
@@ -241,7 +255,7 @@ ORDER BY Category, Year DESC, Month DESC;"""
         city = input("Enter city: ")
         pin = int(input("Enter 6 digit pin code: "))
 
-        query_insert = """insert into Customer (username, password, first_name, last_name, phone_number, email_address, subscription_type, coupon_ID, house_number, street_name, city, pincode) values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s, %s,%s)"""
+        query_insert = """insert into Customer (username, password, first_name, last_name, phone_number, email_address, subscription_type, couponID, house_number, street_name, city, pincode) values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s, %s,%s)"""
         val = (username, password, f_name, l_name, phone, mail, subs_type, coupon_id, h_no, street, city, pin)
         cursor.execute(query_insert,val)
         mydb.commit ()
@@ -251,7 +265,7 @@ ORDER BY Category, Year DESC, Month DESC;"""
     
     elif (input_landing_page == 4):
         while(True):
-            query_auth_dist = """Select distributor_ID,password from Distributor"""
+            query_auth_dist = """Select distributorID,password from Distributor"""
             id_dist = int(input("Enter your Distributor ID: "))
             cursor.execute(query_auth_dist)
             valid_user = 0
@@ -272,74 +286,7 @@ ORDER BY Category, Year DESC, Month DESC;"""
                 print("Authenticated")
                 break
             else:
-                print("Invalid Username or password\n")
-                count+=1
-                print(f"{3-count} tries remaining\n")
-
-
-        while (valid_admin):
-            print(f"\nWelcome {username}")
-            print("""Please choose a number from the menu to proceed: 
-
-
-1. Add Category
-2. View All Category
-3. Log out\n""")
-            input_admin = int(input("Enter the number: "))
-            
-            query_report = """SELECT
-Category.category_name AS Category,
-FROM
-Category
-JOIN Product ON Category.category_ID = Product.category_ID
-JOIN Orders ON Product.product_ID = Orders.product_ID
-JOIN Billing ON Orders.order_ID = Billing.order_ID
-WHERE
-Order.date_order_placed >= DATE_SUB(NOW(), INTERVAL 3 MONTH)
-GROUP BY
-Category.category_name WITH ROLLUP
-HAVING
-Category IS NOT NULL"""
-                
-
-            query_data = """SELECT
-COALESCE(c.category_name, 'All Categories') AS Category,
-YEAR(o.date_order_placed) AS Year,
-MONTH(o.date_order_placed) AS Month,
-SUM(o.order_amount) AS Sales,
-COUNT(DISTINCT o.username) AS Customers,
-COUNT(DISTINCT o.product_ID) AS Products
-FROM
-Order o
-JOIN Product p ON o.product_ID = p.product_ID
-JOIN Category c ON p.categoryID = c.categoryID
-GROUP BY Category, Year, Month with ROLLUP
-HAVING
-Month is NOT NULL
-ORDER BY Category, Year DESC, Month DESC;"""
-           
-
-            if (input_admin == 1):
-                input_add_category = input("Enter the name of Category that you want to Add: ")
-                #PLEASE CHECK IF WE CAN ALSO INSERT ONE PRODUCT WHILE WE MAKE A CATEGORY, I HAVE LEFT THAT OUT RN
-                #input_prod = input(f"Enter the name of one product to add in {input_add_category}")
-                category_id = int(input("Enter Category ID: "))
-                query_category = """INSERT INTO Category(category_ID, category_name) VALUES (%s,%s);"""
-                val = (category_id, input_add_category)
-                cursor.execute(query_category, val)
-                mydb.commit()
-
-            elif (input_admin == 2):
-                query = "select * from Category"
-                cursor.execute(query)
-                for row in cursor.fetchall():
-                    print(f"Category ID: {row[0]}, Category Name: {row[1]}")
-
-            elif (input_admin == 3):
-                break
-                
-            else:
-                print("Invalid Input!")
+                print("Invalid Password \n")
     
 
     elif(input_landing_page == 6):
