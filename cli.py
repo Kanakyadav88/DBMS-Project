@@ -257,20 +257,30 @@ Category IS NOT NULL"""
                 mydb.commit ()
 
             elif(input_user == 4):
-                
-                    # Track Orders
+    # Track order functionality
                 query_track_orders = """SELECT Orders.order_ID, Orders.status, Product.name, Orders.quantity, Orders.order_amount
-                FROM Orders
-                INNER JOIN Product ON Orders.product_ID = Product.product_ID
-                WHERE Orders.Customer_username = %s"""
+                                        FROM Orders
+                                        INNER JOIN Product ON Orders.product_ID = Product.product_ID
+                                        WHERE Orders.customer_username = %s"""
                 cursor.execute(query_track_orders, (username,))
                 orders = cursor.fetchall()
                 if orders:
                     print("Your Orders:")
-                        for order in orders:
-                            print(f"Order ID: {order[0]}, Status: {order[1]}, Product: {order[2]}, Quantity: {order[3]}, Amount: {order[4]}")
+                    for order in orders:
+                        print(f"Order ID: {order[0]}, Status: {order[1]}, Product: {order[2]}, Quantity: {order[3]}, Amount: {order[4]}")
                 else:
                     print("You have no orders yet.")
+                
+
+
+
+
+
+
+
+                
+                
+                
             elif (input_user == 5):
                 break
 
