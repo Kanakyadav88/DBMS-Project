@@ -27,10 +27,8 @@ while(True):
         """ 1. Admin LogIn 
             2. User LogIn
             3. User SignUp
-            4. Distributor LogIn
-            5. Return Order
-            6. Track  Order
-            7. Exit"""
+            4. Seller LogIn
+            5. Exit"""
           )
           
     #SHOULD WE MAKE A DISTRIBUTOR SIGN-UP?
@@ -179,7 +177,9 @@ Category IS NOT NULL"""
             print("""1. View Categories
                     2. View Cart
                     3. Proceed To Checkout
-                    4. Exit to Main Menu""")
+                    4. Track Order details
+                    5. Return details
+                    6. Exit to Main Menu""")
             input_user = int(input("Enter the number from the menu: "))
             if (input_user == 1):
                 query = "select category_name from Category"
@@ -270,7 +270,67 @@ Category IS NOT NULL"""
                 cursor.execute(query_insert,val)
                 mydb.commit ()
 
-            elif (input_user == 4):
+            # Track Orders Details.
+            elif (input_user == 4):   
+        
+                def track_order(username):
+                    # Track Orders Query
+                    query_track_orders = """SELECT TrackOrder.delivery_ID, TrackOrder.status, Orders.order_amount, Product.name, TrackOrder.expected_arrival_time
+                                            FROM TrackOrder
+                                            INNER JOIN Orders ON TrackOrder.order_ID = Orders.order_ID
+                                            INNER JOIN Product ON Orders.product_ID = Product.product_ID
+                                            WHERE Orders.customer_username = %s"""
+                    cursor.execute(query_track_orders, (username,))
+                    orders = cursor.fetchall()
+                    if orders:
+                        print("Your Orders:")
+                        for order in orders:
+                            print(f"Delivery ID: {order[0]}, Status: {order[1]}, Amount: {order[2]}, Product: {order[3]}, Expected Arrival Time: {order[4]}")
+
+                    else:
+                        print("You have no orders yet.")
+
+            # Return Order Details.
+            elif(input_user == 5):
+                
+                # Function to calculate expected return date
+                def calculate_expected_return_date(order_date):
+                    return order_date + timedelta(days=14)
+
+                # Function to check if a return is within the allowed return period
+                def is_within_return_period(order_date_str):
+                    try:
+                        order_date = datetime.strptime(order_date_str, "%Y-%m-%d")
+                        expected_return_date = calculate_expected_return_date(order_date)
+                        return datetime.now() <= expected_return_date
+                    except ValueError:
+                        return False
+
+                while True:
+                    order_id = int(input("Enter your Order ID to check return details (Enter 0 to exit): "))
+                    if order_id == 0:
+                        print("Exiting...")
+                        break
+
+                    # Check if the order exists
+                    query_check_order = "SELECT * FROM Orders WHERE order_ID = %s"
+                    cursor.execute(query_check_order, (order_id,))
+                    order_data = cursor.fetchone()
+
+                    if order_data:
+                        order_date = order_data[1]
+                        if is_within_return_period(order_date):
+                            return_date = input("Enter return date (YYYY-MM-DD): ")
+                            query_insert_return = "INSERT INTO Return_entity (order_ID, return_date) VALUES (%s, %s)"
+                            cursor.execute(query_insert_return, (order_id, return_date))
+                            mydb.commit()
+                            print("Return order successfully added.")
+                        else:
+                            print("Return period has expired. You cannot return this order.")
+                    else:
+                        print("Order not found. Please enter a valid Order ID.")
+
+            elif (input_user == 6):
                 break
 
             else:
@@ -323,52 +383,7 @@ Category IS NOT NULL"""
             else:
                 print("Invalid Password \n")
     
-#   Return Order Details.
     elif(input_landing_page == 5):
-        
-                # Function to calculate expected return date
-        def calculate_expected_return_date(order_date):
-            return order_date + timedelta(days=14)
-
-        # Function to check if a return is within the allowed return period
-        def is_within_return_period(order_date_str):
-            try:
-                order_date = datetime.strptime(order_date_str, "%Y-%m-%d")
-                expected_return_date = calculate_expected_return_date(order_date)
-                return datetime.now() <= expected_return_date
-            except ValueError:
-                return False
-
-        # CLI for return orders
-        while True:
-            order_id = int(input("Enter your Order ID to check return details (Enter 0 to exit): "))
-            if order_id == 0:
-                print("Exiting...")
-                break
-
-            # Check if the order exists
-            query_check_order = "SELECT * FROM Orders WHERE order_ID = %s"
-            cursor.execute(query_check_order, (order_id,))
-            order_data = cursor.fetchone()
-
-            if order_data:
-                order_date = order_data[1]
-                if is_within_return_period(order_date):
-                    return_date = input("Enter return date (YYYY-MM-DD): ")
-                    query_insert_return = "INSERT INTO Return_entity (order_ID, return_date) VALUES (%s, %s)"
-                    cursor.execute(query_insert_return, (order_id, return_date))
-                    mydb.commit()
-                    print("Return order successfully added.")
-                else:
-                    print("Return period has expired. You cannot return this order.")
-            else:
-                print("Order not found. Please enter a valid Order ID.")
-#  Track Order Details
-    elif(input_landing_page == 6):
-        break
-
-
-    elif(input_landing_page == 7):
         break
     
     else:
