@@ -1,5 +1,6 @@
 import mysql.connector
 from datetime import datetime, timedelta
+from tabulate import tabulate
 
 # Establish connection
 mydb = mysql.connector.connect(
@@ -15,28 +16,87 @@ if mydb.is_connected():
 
 # Create cursor object
 cursor = mydb.cursor()
+def print_welcome_message():
+    print("\033[1m")
+    print("╔══════════════════════════════════════════╗")
+    print("║          Welcome to Online Store         ║")
+    print("║                 * Amazon *               ║")
+    print("╚══════════════════════════════════════════╝")
+    print("\033[0m")
+
+def print_main_menu():
+    print("\033[1m")
+    print("╔═══════════════════════════════════════════════════════╗")
+    print("║                  Welcome to Our Store                 ║")
+    print("╠═══════════════════════════════════════════════════════╣")
+    print("║                                                       ║")
+    print("║                     Main Menu                         ║")
+    print("║                                                       ║")
+    print("║ 1. Admin LogIn                                        ║")
+    print("║ 2. User LogIn                                         ║")
+    print("║ 3. User SignUp                                        ║")
+    print("║ 4. Seller LogIn                                       ║")
+    print("║ 5. Exit                                               ║")
+    print("║                                                       ║")
+    print("╚═══════════════════════════════════════════════════════╝")
+    print("\033[0m")
+
+
+def print_admin_menu(username):
+    print("\033[1m")
+    print("╔════════════════════════════════════════════════╗")
+    print("║               Welcome to the Admin Panel       ║")
+    print("╠════════════════════════════════════════════════╣")
+    print("║                                                ║")
+    print("║     Hello, ", username.center(13), "                     ║")
+    print("║                                                ║")
+    print("║  Please choose an option from the menu below:  ║")
+    print("║                                                ║")
+    print("║  1. View Quarterly Sales of Each Category      ║")
+    print("║  2. View Top 5 Customers                       ║")
+    print("║  3. Data of Items in the Inventory             ║")
+    print("║  4. Add Category                               ║")
+    print("║  5. View All Categories                        ║")
+    print("║  6. View All Sellers                           ║")
+    print("║  7. Log Out                                    ║")
+    print("║                                                ║")
+    print("╚════════════════════════════════════════════════╝")
+    print("\033[0m")
+
+
+def print_user_menu(username):
+    print("\033[1m")
+    print(f"╔══════════════════════════════════════════════╗")
+    print(f"║             Welcome {username.center(11)}              ║")
+    print(f"╠══════════════════════════════════════════════ ╣")
+    print("║                                                ║")
+    print("║           User Menu Options:                   ║")
+    print("║                                                ║")
+    print("║ 1. View Categories                             ║")
+    print("║ 2. View Cart                                   ║")
+    print("║ 3. Proceed To Checkout                         ║")
+    print("║ 4. Track Order details                         ║")
+    print("║ 5. Return details                              ║")
+    print("║ 6. Exit to Main Menu                           ║")
+    print("║                                                ║")
+    print("╚══════════════════════════════════════════════╝")
+    print("\033[0m")
+
+
+
 
 while(True):
-    print("\n")
-    print("Online Store Amazon")
-    print("Welcome to the Online Retail Store")
+    print_welcome_message()
     print("---------------------------------------------")
+    print_main_menu()
     print("Please choose a number from the menu to proceed: ")
     
-    print(
-        """ 1. Admin LogIn 
-            2. User LogIn
-            3. User SignUp
-            4. Seller LogIn
-            5. Exit"""
-          )
           
     #SHOULD WE MAKE A DISTRIBUTOR SIGN-UP?
 
     input_landing_page = int(input("Enter the number: "))
     #ADMIN LOGIN
     if (input_landing_page == 1):
-        print("ADMIN")
         print("---------------------------------------------")
         count = 0
         valid_admin = 0
@@ -60,15 +120,7 @@ while(True):
 
 
         while (valid_admin):
-            print(f"\nWelcome {username}")
-            print("""Please choose a number from the menu to proceed: 
-1. View Quarterly Sales of the each Category
-2. View Top 5 Customers(based on money spent)
-3. Data of items in the Inventory for each storage type
-4. Add Category
-5. View All Category
-6. View all Sellers
-7. Log out\n""")
+            print_admin_menu(username)
             input_admin = int(input("Enter the number: "))
             
             if (input_admin == 1):
@@ -171,15 +223,9 @@ Category IS NOT NULL"""
                 print(f"{3-count} tries remaining\n")
 
         while(valid_user):
-            print(f"Welcome {username}")
             print("---------------------------------------------")
-            print("Please choose a number from the menu to proceed: ")
-            print("""1. View Categories
-                    2. View Cart
-                    3. Proceed To Checkout
-                    4. Track Order details
-                    5. Return details
-                    6. Exit to Main Menu""")
+            print_user_menu(username)
+
             input_user = int(input("Enter the number from the menu: "))
             if (input_user == 1):
                 query = "select category_name from Category"
@@ -271,24 +317,29 @@ Category IS NOT NULL"""
                 mydb.commit ()
 
             # Track Orders Details.
-            elif (input_user == 4):   
-        
-                def track_order(username):
-                    # Track Orders Query
-                    query_track_orders = """SELECT TrackOrder.delivery_ID, TrackOrder.status, Orders.order_amount, Product.name, TrackOrder.expected_arrival_time
-                                            FROM TrackOrder
-                                            INNER JOIN Orders ON TrackOrder.order_ID = Orders.order_ID
-                                            INNER JOIN Product ON Orders.product_ID = Product.product_ID
-                                            WHERE Orders.customer_username = %s"""
-                    cursor.execute(query_track_orders, (username,))
-                    orders = cursor.fetchall()
-                    if orders:
-                        print("Your Orders:")
-                        for order in orders:
-                            print(f"Delivery ID: {order[0]}, Status: {order[1]}, Amount: {order[2]}, Product: {order[3]}, Expected Arrival Time: {order[4]}")
+            elif (input_user == 4):    
+                # Track Orders Query
+                username = input("Enter username: ")
+                query_track_orders = """SELECT TrackOrder.delivery_ID, TrackOrder.status, Orders.order_amount, Products.name, TrackOrder.expected_arrival_time
+                                        FROM TrackOrder
+                                        INNER JOIN Orders ON TrackOrder.order_ID = Orders.order_ID
+                                        INNER JOIN Products ON Orders.product_ID = Products.product_ID
+                                        WHERE Orders.customer_username = %s"""
+                cursor.execute(query_track_orders, (username,))
+                orders = cursor.fetchall()
 
-                    else:
-                        print("You have no orders yet.")
+                # Convert fetched data into a list of lists for tabulate
+                data = [list(order) for order in orders]
+
+                if data:
+                    # Define table headers
+                    headers = ["Delivery ID", "Status", "Amount", "Products", "Expected Arrival Time"]
+                    
+                    # Print the tabulated output
+                    print("Your Orders:")
+                    print(tabulate(data, headers=headers, tablefmt="grid"))  # You can change "grid" to other table formats
+                else:
+                    print("You have no orders yet.")
 
             # Return Order Details.
             elif(input_user == 5):
@@ -296,6 +347,7 @@ Category IS NOT NULL"""
                 # Function to calculate expected return date
                 def calculate_expected_return_date(order_date):
                     return order_date + timedelta(days=14)
+                
 
                 # Function to check if a return is within the allowed return period
                 def is_within_return_period(order_date_str):
