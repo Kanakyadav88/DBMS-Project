@@ -16,6 +16,9 @@ if mydb.is_connected():
 
 # Create cursor object
 cursor = mydb.cursor()
+login_attempts = 0
+max_attempts = 3
+
 def print_welcome_message():
     print("\033[1m")
     print("╔══════════════════════════════════════════╗")
@@ -83,7 +86,19 @@ def print_user_menu(username):
     print("\033[0m")
 
 
-
+def print_seller_menu(seller_name):
+    print("\033[1m")
+    print(f"╔════════════════════════════════════════════════════╗")
+    print(f"║                 Welcome {seller_name.center(15)}               ║")
+    print(f"╠════════════════════════════════════════════════════╣")
+    print("║                                                    ║")
+    print("║               Seller Menu Options:                 ║")
+    print("║                                                    ║")
+    print("║ 1. View Seller Details                             ║")
+    print("║ 2. Log out                                         ║")
+    print("║                                                    ║")
+    print("╚════════════════════════════════════════════════════╝")
+    print("\033[0m")
 
 while(True):
     print_welcome_message()
@@ -412,29 +427,55 @@ Category IS NOT NULL"""
     
     elif (input_landing_page == 4):
         while(True):
-            query_auth_dist = """Select distributorID,password from Distributor"""
-            id_dist = int(input("Enter your Distributor ID: "))
-            cursor.execute(query_auth_dist)
-            valid_user = 0
+            query_auth_seller = """SELECT seller_ID, password, name FROM Seller"""
+            seller_name = input("Enter your Seller Name: ")
+            password = input("Enter your password: ")
+            cursor.execute(query_auth_seller)
+            valid_user = False
+            seller_data = None
             for row in cursor.fetchall():
-                if (id_dist) == row[0]:
-                    store = row
-                    print(row)
-                    valid_user = 1
+                if seller_name == row[2] and password == row[1]:
+                    seller_data = row
+                    valid_user = True
                     break
             if valid_user:
-                break
-            else: 
-                print("Invalid ID\n")
-
-        while(True):
-            password = input("Enter your password: ")
-            if password in store:
-                print("Authenticated")
+                print("Authenticated\n")
                 break
             else:
-                print("Invalid Password \n")
-    
+                login_attempts += 1
+                if login_attempts < max_attempts:
+                    print("Invalid Seller Name or Password. Please try again.\n")
+                    print(f"{max_attempts - login_attempts} attempts remaining.\n")
+                else:
+                    print("Maximum login attempts reached. Exiting...\n")
+                    exit()
+
+        while valid_user:
+            print_seller_menu(seller_name)
+            input_seller = int(input("Enter the number: "))
+
+            if input_seller == 1:
+                print("\nSeller Details: ")
+                # Fetch all attributes and their values for the particular seller
+                query_fetch_details = """SELECT * FROM Seller WHERE seller_ID = %s"""
+                cursor.execute(query_fetch_details, (seller_data[0],))
+                seller_details = cursor.fetchone()
+                    
+                 # Display all attributes and their values
+                print("Seller ID:", seller_details[0])
+                print("Product ID:", seller_details[3])
+                print("Quantity Sold:", seller_details[4])
+                print("Phone Number:", seller_details[5])
+                print("Email Address:", seller_details[6])
+                print("Earnings:", seller_details[7])
+                print("Payment Details:", seller_details[8])
+
+            elif input_seller == 2:
+                break
+            else:
+                print("Invalid Input!")
+                
+
     elif(input_landing_page == 5):
         break
     
