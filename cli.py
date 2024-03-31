@@ -175,7 +175,8 @@ Category IS NOT NULL"""
             print("""1. View Categories
                     2. View Cart
                     3. Proceed To Checkout
-                    4. Exit to Main Menu""")
+                    4. Track order
+                    5. Exit to Main Menu""")
             input_user = int(input("Enter the number from the menu: "))
             if (input_user == 1):
                 query = "select category_name from Category"
@@ -255,7 +256,22 @@ Category IS NOT NULL"""
                 cursor.execute(query_insert,val)
                 mydb.commit ()
 
-            elif (input_user == 4):
+            elif(input_user == 4):
+                
+                    # Track Orders
+                query_track_orders = """SELECT Orders.order_ID, Orders.status, Product.name, Orders.quantity, Orders.order_amount
+                FROM Orders
+                INNER JOIN Product ON Orders.product_ID = Product.product_ID
+                WHERE Orders.Customer_username = %s"""
+                cursor.execute(query_track_orders, (username,))
+                orders = cursor.fetchall()
+                if orders:
+                    print("Your Orders:")
+                        for order in orders:
+                            print(f"Order ID: {order[0]}, Status: {order[1]}, Product: {order[2]}, Quantity: {order[3]}, Amount: {order[4]}")
+                else:
+                    print("You have no orders yet.")
+            elif (input_user == 5):
                 break
 
             else:
