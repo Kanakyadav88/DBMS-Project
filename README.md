@@ -10,7 +10,8 @@ Main Goal:
 The primary focus of our application is to enhance user experience, with a special emphasis on improving the Customer Sector's interactions and functionality.
 
 Database Schema Description
-Entities and Attributes:
+Entities and Attributes
+
 Admin:
 Manages and supervises all aspects of the platform.
 
@@ -80,3 +81,27 @@ Phone_Number, Email_ID, Earnings, Payment_Details: Contact and financial informa
 
 Inventory:
 product_id: IDs of all products available.
+
+Functionalities
+Seller Functionalities:
+Introduce new products to existing categories.
+Create new categories and add items to them.
+Remove products from inventory.
+Send delivery requests to partners for customer deliveries.
+
+Customer Functionalities:
+Browse the product catalogue with pricing.
+Add or remove products from the cart.
+Provide delivery address and proceed with payment.
+Contact delivery personnel.
+Clear the cart or retain items through sessions.
+View transaction history.
+Donate to affiliated NGOs through 'Lets Help'.
+Rate and review products and delivery service.
+
+Admin Functionalities:
+Access information on distributors, delivery partners, customers, and affiliated NGOs.
+Ensure correct purchase and delivery processes.
+Display order history to customers.
+Contact distributors for item restocking.
+Manage funds from donations and a portion of net profits for NGO support.
