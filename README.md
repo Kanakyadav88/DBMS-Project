@@ -1,6 +1,6 @@
-Online Amazon Store Database Management
+Swift Shop (Database Management)
 
-Welcome to the repository for the Online Amazon Store application. This application is designed to streamline the shopping experience, offering a robust platform for customers, sellers, and administrators to manage transactions, track orders, and maintain inventory seamlessly.
+Welcome to the repository for the Swift Shop, an Online Retail Store application. This application is designed to streamline the shopping experience, offering a robust platform for customers, sellers, and administrators to manage transactions, track orders, and maintain inventory seamlessly.
 
 Assumptions:
 Delivery partners are assigned automatically.
