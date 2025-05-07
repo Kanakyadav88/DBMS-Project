@@ -1,6 +1,6 @@
-# Swift Shop – Online Retail Store (DBMS Project)
+# Online Retail Store (DBMS Project)
 
-Swift Shop is a comprehensive database-driven application simulating an online retail platform. Designed with a focus on enhancing the customer shopping experience, the system provides tailored functionality for administrators, customers, and sellers to interact efficiently with the inventory and ordering systems.
+Online Retail shop is a comprehensive database-driven application simulating an online retail platform. Designed with a focus on enhancing the customer shopping experience, the system provides tailored functionality for administrators, customers, and sellers to interact efficiently with the inventory and ordering systems.
 
 ## Overview
 
