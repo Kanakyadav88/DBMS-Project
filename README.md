@@ -1,107 +1,119 @@
-Swift Shop (Database Management)
+# Swift Shop – Online Retail Store (DBMS Project)
 
-Welcome to the repository for the Swift Shop, an Online Retail Store application. This application is designed to streamline the shopping experience, offering a robust platform for customers, sellers, and administrators to manage transactions, track orders, and maintain inventory seamlessly.
+Swift Shop is a comprehensive database-driven application simulating an online retail platform. Designed with a focus on enhancing the customer shopping experience, the system provides tailored functionality for administrators, customers, and sellers to interact efficiently with the inventory and ordering systems.
 
-Assumptions:
-Delivery partners are assigned automatically.
-Sellers manage the delivery of their products to the inventory independently.
+## Overview
 
-Main Goal:
-The primary focus of our application is to enhance user experience, with a special emphasis on improving the Customer Sector's interactions and functionality.
+The primary objective of Swift Shop is to streamline and optimize the online shopping experience. It offers robust role-based features for inventory management, order tracking, transaction handling, and customer engagement, backed by a well-structured relational database.
 
-Database Schema Description
-Entities and Attributes
+## Assumptions
 
-Admin:
-Manages and supervises all aspects of the platform.
+- Delivery partners are assigned automatically by the system.
+- Sellers independently manage the logistics of delivering their products to the platform’s inventory.
 
-Products:
-Product_ID: Unique identifier for each product.
-Category_ID: Links to the product category.
-Name: Product name.
-Price: Listed price.
-Quantity: Stock available.
-Discount: Any active discounts.
-Storage_Type: Required storage conditions.
-Rating: Average user rating.
-Description: Brief product description.
+## Core Functionalities
 
-Customers:
-Username: Unique login identifier.
-Password: Secure authentication credential.
-Name: Includes first and last names.
-Phone_Number: Contact number.
-Address: Detailed residential address including house number, street name, city, and pin code.
+### Customer Features
 
-Cart:
-Tied to the customer via Username.
-Billing_Amount: Total cost.
-{Product_ID}: Products in the cart.
-Quantity: Items per product.
-Date: Transaction date.
+- Browse product catalog by category with real-time pricing and discount visibility
+- Add and remove items from cart
+- Provide delivery address and complete payment for orders
+- View and manage transaction history
+- Contact assigned delivery personnel
+- Maintain cart items across sessions
+- Donate to affiliated NGOs through the ‘Lets Help’ initiative
+- Rate and review products and delivery services
 
-Offers:
-Upto_Discount: Maximum available discount.
-Category_ID: Applicable product category.
-Expiry_Date: Validity of the offer.
+### Seller Features
 
-Category:
-Category_ID: Unique category identifier.
-Category_name: Name of the category.
+- Add new products under existing categories
+- Create new product categories
+- Update inventory and manage product listings
+- Request delivery partners for customer order fulfillment
 
-Orders:
-Order_ID: Unique order identifier.
-Username: Customer's username.
-Order_Amount: Total amount.
-{Product_ID, Quantity}: Ordered products and their quantities.
-Discount: Applied discounts.
-Date_Order_Placed: Order date.
+### Admin Features
 
-Transactions & History:
-Billing_ID: Unique billing identifier.
-Order_ID: Associated order.
-Payment_Mode: Method of payment.
-Bill_Amount: Billed amount.
+- View and manage data related to customers, sellers, delivery partners, distributors, and NGOs
+- Ensure order fulfillment processes are functioning correctly
+- Monitor donation funds and allocate a portion of profits to NGO support
+- Restock products by contacting distributors
+- Provide customers with complete order and transaction history
 
-Return:
-Return_ID: Unique return transaction identifier.
-Order_ID: Linked order.
-Delivery_ID: Corresponding delivery.
-Return_Date: Processing date for the return.
+## Database Schema
 
-Track Order:
-Details about the delivery process including delivery personnel, vehicle used, current status, associated orders, pickup and delivery addresses, estimated arrival times, and delivery ratings.
-Seller
-Seller_ID: Unique identifier.
-Password: Authentication credential.
-{Product_ID}: Products linked to the seller.
-Quantity_sold: Total products sold.
-Name: Seller's full name.
-Phone_Number, Email_ID, Earnings, Payment_Details: Contact and financial information.
+### Key Entities and Attributes
 
-Inventory:
-product_id: IDs of all products available.
+#### Admin
+- Oversees and monitors the entire platform
 
-Functionalities
-Seller Functionalities:
-Introduce new products to existing categories.
-Create new categories and add items to them.
-Remove products from inventory.
-Send delivery requests to partners for customer deliveries.
+#### Products
+- Product_ID: Unique identifier
+- Category_ID: Links to category
+- Name, Price, Quantity, Discount
+- Storage_Type, Rating, Description
 
-Customer Functionalities:
-Browse the product catalogue with pricing.
-Add or remove products from the cart.
-Provide delivery address and proceed with payment.
-Contact delivery personnel.
-Clear the cart or retain items through sessions.
-View transaction history.
-Donate to affiliated NGOs through 'Lets Help'.
-Rate and review products and delivery service.
+#### Customers
+- Username, Password, Name
+- Phone_Number, Address
 
-Admin Functionalities:
-Access information on distributors, delivery partners, customers, and affiliated NGOs.
-Ensure correct purchase and delivery processes.
-Display order history to customers.
-Contact distributors for item restocking.
-Manage funds from donations and a portion of net profits for NGO support.
+#### Cart
+- Username, Billing_Amount
+- Product_IDs and Quantities
+- Date of transaction
+
+#### Offers
+- Upto_Discount, Category_ID, Expiry_Date
+
+#### Category
+- Category_ID, Category_name
+
+#### Orders
+- Order_ID, Username, Order_Amount
+- Product_IDs, Quantities
+- Discounts, Date_Order_Placed
+
+#### Transactions & History
+- Billing_ID, Order_ID
+- Payment_Mode, Bill_Amount
+
+#### Returns
+- Return_ID, Order_ID, Delivery_ID
+- Return_Date
+
+#### Track Order
+- Tracks delivery status, personnel, vehicle details, estimated time of arrival, delivery ratings, and addresses
+
+#### Seller
+- Seller_ID, Password, Name
+- Product_IDs, Quantity_sold
+- Contact info, Payment_Details, Earnings
+
+#### Inventory
+- Maintains availability of products via Product_IDs
+
+## Technical Highlights
+
+- Implementation using SQL with relational schema design and query optimization
+- Integration with Python CLI for user interaction
+- Automation via triggers for cart and order status
+- Data integrity ensured through constraints and normalization
+- Role-based access handling for Admin, Customer, and Seller workflows
+
+## Installation & Setup
+
+1. Clone the repository
+2. Import the SQL schema and populate the database using provided seed data
+3. Run the Python-based CLI to interact with the system
+4. Use the SQL interface (e.g., MySQL Workbench or command-line) to query or inspect data
+
+## Contributions
+
+Developed as a semester project under the guidance of Prof. Vikram Goyal. All team members contributed to database design, Python integration, and testing.
+
+## Contact
+
+For questions or collaboration opportunities, contact:
+
+- Kanak Yadav  
+- Email: kanak22611@iiitd.ac.in  
+- GitHub: [github.com/Kanakyadav88](https://github.com/Kanakyadav88)
